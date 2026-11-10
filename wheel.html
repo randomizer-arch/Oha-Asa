@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oha Asa 100-Item Wheel</title>
+    <style>
+        body {
+            background-color: #121214;
+            color: #e1e1e6;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #ffbb00;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #8d8d99;
+            margin-bottom: 30px;
+        }
+        .wheel-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin: 0 auto 30px auto;
+        }
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #f75a68;
+            z-index: 10;
+        }
+        canvas {
+            border-radius: 50%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            transition: transform 5s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+        button {
+            background-color: #ffbb00;
+            color: #121214;
+            border: none;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #e6a100;
+        }
+        button:disabled {
+            background-color: #29292e;
+            color: #7c7c8a;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 35px;
+            color: #ffcd1e;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lucky item</h1>
+    <div class="subtitle">100 Calibrated Variables Check</div>
+    
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="500" height="500"></canvas>
+    </div>
+    
+    <button id="spinBtn" onclick="spinWheel()">Spin for Item</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const items = [
+        "Chewed Pen Cap", "Lost Pencil Eraser", "School Ruler", "Homework Notebook", "Crumpled Draft",
+        "Sticky Note", "Yellow Highlighter", "Paperclip Chain", "Glue Stick", "Sharpener Shavings",
+        "Protractor", "Binder Clip", "Index Card", "Textbook Bookmark", "Unsharpened Pencil",
+        "Safe Juice Box", "Water Bottle", "Apple Core", "Banana Peel", "Empty Chip Bag",
+        "Cookie Crumbs", "Chocolate Wrapper", "Clean Spoon", "Drinking Straw", "Bread Crust",
+        "Mandarin Peel", "Napkin Ball", "Soda Can Tab", "Popcorn Kernel", "Gum Wrapper",
+        "Phone Charger", "Single Keycap", "Mousepad Edge", "AA Battery", "USB Drive",
+        "HDMI Cable Clip", "Monitor Wipe", "Earbud Tip", "Microfiber Cloth", "Console Controller",
+        "Old Phone Case", "LAN Cable Tie", "Desk Mat Corner", "Webcam Cover", "PC Case Screw",
+        "The Unpaired Shoe", "Clean Socks", "Hoodie String", "Slide Sandal", "Clothes Hanger",
+        "Curtain Pull", "Pillowcase Corner", "Blanket Edge", "Desk Lamp Switch", "Door Handle Clip",
+        "Bedside Coin", "Random Key", "Shoelace Knot", "Baseball Cap", "T-Shirt Tag",
+        "Backpack Zipper", "Wallet Card", "Belt Loop", "Tissue Box", "Dust Bunny",
+        "Tape Roll Tower", "Rubber Band", "Bottle Cap", "Safety Pin", "Guitar Pick",
+        "Gaming Dice", "Fidget Spinner", "Lego Brick", "Trading Card", "Comic Book Page",
+        "Feather", "Smooth Stone", "Marble", "Postcard", "Sticker Backing",
+        "Puzzle Piece", "Bubble Wrap Sheet", "Toy Soldier", "Keyring", "Measuring Tape",
+        "Paper Boat", "Cardboard Box Flap", "Plastic Tag", "Toothpick", "Matchstick",
+        "Postage Stamp", "Paper Bookmark", "Dry Leaf", "Sea Shell", "Piece of String",
+        "Thumbtack", "Magnifying Glass", "Drink Coaster", "Paper Crane", "Bread Twist Tie"
+    ];
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const resultDiv = document.getElementById("result");
+    
+    const size = canvas.width;
+    const center = size / 2;
+    const totalItems = items.length;
+    const arc = (2 * Math.PI) / totalItems;
+    let currentRotation = 0;
+
+    function drawWheel() {
+        ctx.clearRect(0, 0, size, size);
+        for (let i = 0; i < totalItems; i++) {
+            const angle = i * arc;
+            // High-contrast alternating colors for 100 slices
+            ctx.fillStyle = i % 2 === 0 ? "#1f1f23" : (i % 4 === 1 ? "#ffbb00" : "#2a2a30");
+            
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            ctx.arc(center, center, center, angle, angle + arc);
+            ctx.lineTo(center, center);
+            ctx.fill();
+            
+            // Render text only for clean layouts (100 slices are tight, dots are used visually)
+            if (i % 5 === 0) {
+                ctx.save();
+                ctx.fillStyle = "#8d8d99";
+                ctx.translate(center, center);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.font = "9px sans-serif";
+                ctx.fillText("•", center - 10, 3);
+                ctx.restore();
+            }
+        }
+    }
+
+    function spinWheel() {
+        spinBtn.disabled = true;
+        resultDiv.style.color = "#8d8d99";
+        resultDiv.innerText = "Recalculating luck parameters...";
+        
+        const extraDegrees = Math.floor(Math.random() * 360) + 2160; // 6 full rotations
+        currentRotation += extraDegrees;
+        
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+        
+        setTimeout(() => {
+            spinBtn.disabled = false;
+            resultDiv.style.color = "#ffcd1e";
+            
+            const normalizedRotation = (360 - (currentRotation % 360)) % 360;
+            const pointerAngle = (normalizedRotation + 270) % 360;
+            const index = Math.floor((pointerAngle / 360) * totalItems) % totalItems;
+            
+            resultDiv.innerText = `Active Luck Anchor: ${items[index]}`;
+        }, 5000);
+    }
+
+    drawWheel();
+</script>
+
+</body>
+</html>
